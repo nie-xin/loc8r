@@ -13,7 +13,7 @@ var openingTimeSchema = new mongoose.Schema({
   }
 })
 
-var reviewShema = new mongoose.Schema({
+var reviewSchema = new mongoose.Schema({
   author: String,
   rating: {
     type: Number,
@@ -28,7 +28,7 @@ var reviewShema = new mongoose.Schema({
   }
 })
 
-var locationShema = new mongoose.Schema({
+var locationSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true
@@ -46,5 +46,7 @@ var locationShema = new mongoose.Schema({
     index: '2dsphere'
   },
   openingTimes: [openingTimeSchema],
-  reviews: [reviewShema]
+  reviews: [reviewSchema]
 })
+
+mongoose.model('Location', locationSchema)
