@@ -108,7 +108,7 @@ module.exports.locationsReadOne = function (req, res) {
 }
 
 module.exports.locationsUpdateOne = function (req, res) {
-  if (!req.params.locationdId) {
+  if (!req.params.locationId) {
     sendJsonResponse(res, 404, { message: 'Not found, locationId is required' })
     return
   }
@@ -118,7 +118,7 @@ module.exports.locationsUpdateOne = function (req, res) {
     .select('-reviews -rating')
     .exec(function (err, location) {
       if (!location) {
-        sendJsonResponse(res, 404, { message: 'locationdId not found' })
+        sendJsonResponse(res, 404, { message: 'locationId not found' })
         return
       } else if (err) {
         sendJsonResponse(res, 400, err)
@@ -151,4 +151,19 @@ module.exports.locationsUpdateOne = function (req, res) {
     })
 }
 
-module.exports.locationsDeleteOne = function (req, res) {}
+module.exports.locationsDeleteOne = function (req, res) {
+  var locationId = req.params.locationId
+  if (locationId) {
+    Loc
+      .findByIdAndRemove(locationId)
+      .exec(function (err, location) {
+        if (err) {
+          sendJsonResponse(res, 404, err)
+          return
+        }
+        sendJsonResponse(res, 204, null)
+      })
+  } else {
+    sendJsonResponse(res, 404, { message: 'No locationId' })
+  }
+}
