@@ -26,6 +26,7 @@ var sendJsonResponse = function (res, status, content) {
 module.exports.locationsListByDistance = function (req, res) {
   var lng = parseFloat(req.query.lng)
   var lat = parseFloat(req.query.lat)
+  var maxDistance = parseFloat(req.query.maxDistance) || 20
 
   if (!lng || !lat) {
     sendJsonResponse(res, 404, { message: 'lng and lat query parameters are required' })
@@ -37,12 +38,16 @@ module.exports.locationsListByDistance = function (req, res) {
     coordinates: [lng, lat]
   }
   var geoOptions = {
-    spheraical: true,
-    maxDistance: theEarth.getRadsFromDistance(20),
+    spherical: true,
+    maxDistance: theEarth.getRadsFromDistance(maxDistance),
     num: 10
   }
 
+  console.log(point, geoOptions)
+
   Loc.geoNear(point, geoOptions, function (err, results, stats) {
+    console.log('Geo Results', results)
+    console.log('Geo stats', stats)
     var locations = []
     if (err) {
       sendJsonResponse(res, 404, err)

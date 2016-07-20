@@ -1,5 +1,14 @@
-/* GET home page */
-module.exports.homelist = function (req, res) {
+var request = require('request')
+
+var apiOptions = {
+  server: 'http://localhost:3000'
+}
+
+if (process.env.NODE_ENV === 'production') {
+  apiOptions.server = 'https://xnie.herokuapp.com/'
+}
+
+var renderHomepage = function (req, res, responseBody) {
   res.render('location-list', {
     title: 'Loc8r - find a place to work with wifi',
     pageHeader: {
@@ -7,25 +16,49 @@ module.exports.homelist = function (req, res) {
       strapline: 'Find places to work with wifi near you!'
     },
     sidebar: "Looking for wifi and a seat? Loc8r helps you find places to work when out and about. Perhaps with coffee, cake or a pint? Let Loc8r help you find the place you're looking for.",
-    locations: [{
-      name: 'Starcups',
-      address: '125 High Street, Reading, RG6 1PS',
-      rating: 3,
-      facilities: ['Hot drinks', 'Food', 'Premium wifi'],
-      distance: '100m'
-    }, {
-      name: 'Cafe Hero',
-      address: '125 High Street, Reading, RG6 1PS',
-      rating: 4,
-      facilities: ['Hot drinks', 'Food', 'Premium wifi'],
-      distance: '200m'
-    }, {
-      name: 'Burger Queen',
-      address: '125 High Street, Reading, RG6 1PS',
-      rating: 2,
-      facilities: ['Food', 'Premium wifi'],
-      distance: '250m'
-    }]
+    locations: responseBody
+  })
+}
+
+var _formatDistance = function (distance) {
+  var num = null
+  var unit = null
+
+  if (distance > 1) {
+    num = parseFloat(distance).toFixed(1)
+    unit = 'km'
+  } else {
+    num = parseInt(distance * 1000, 10)
+    unit = 'm'
+  }
+
+  return num + unit
+}
+
+/* GET home page */
+module.exports.homelist = function (req, res) {
+  var path = '/api/locations'
+  var requestOptions = {
+    url: apiOptions.server + path,
+    method: 'GET',
+    json: {},
+    qs: {
+      lng: -0.9690883,
+      lat: 51.455041,
+      maxDistance: 200
+    }
+  }
+
+  request(requestOptions, function (err, response, body) {
+    if (err) {
+      console.error(err)
+    }
+
+    var data = body.map(function (model) {
+      model.distance = _formatDistance(model.distance)
+      return model
+    })
+    renderHomepage(req, res, data)
   })
 }
 
