@@ -8,4 +8,4 @@
 
 ## TODO
 
-- [ ] Add front end framework (gn2 ideally)
+- [ ] Add front end framework
