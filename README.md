@@ -8,4 +8,4 @@
 
 ## TODO
 
-- [ ] Add front end framework
+- [x] Add front end framework
