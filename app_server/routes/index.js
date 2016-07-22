@@ -6,7 +6,8 @@ var controllerOthers = require('../controllers/others')
 /* Locations pages */
 router.get('/', controllerLocations.homelist)
 router.get('/location/:locationId', controllerLocations.locationInfo)
-router.get('/location/review/new', controllerLocations.addReview)
+router.get('/location/:locationId/reviews/new', controllerLocations.addReview)
+router.post('/location/:locationId/reviews/new', controllerLocations.doAddReview)
 
 /* Other pages */
 router.get('/about', controllerOthers.about)

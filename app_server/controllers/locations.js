@@ -80,6 +80,39 @@ var _showError = function (req, res, status) {
   })
 }
 
+var renderReviewForm = function (req, res, locDetail) {
+  res.render('location-review-form', {
+    title: 'Review ' + locDetail.name + ' on Loc8r',
+    pageHeader: { title: 'Review ' + locDetail.name }
+  })
+}
+
+var getLocationInfo = function (req, res, callback) {
+  var path = '/api/locations/' + req.params.locationId
+  var requestOptions = {
+    url: apiOptions.server + path,
+    method: 'GET',
+    json: {}
+  }
+
+  request(requestOptions, function (err, response, body) {
+    if (err) {
+      _showError(req, res, err)
+    }
+
+    var data = body
+    if (response.statusCode === 200) {
+      data.coords = {
+        lng: body.coords[0],
+        lat: body.coords[1]
+      }
+      callback(req, res, data)
+    } else {
+      _showError(req, res, response.statusCode)
+    }
+  })
+}
+
 /* GET home page */
 module.exports.homelist = function (req, res) {
   var path = '/api/locations'
@@ -111,34 +144,41 @@ module.exports.homelist = function (req, res) {
 
 /* GET location info page */
 module.exports.locationInfo = function (req, res) {
-  var path = '/api/locations/' + req.params.locationId
-  var requestOptions = {
-    url: apiOptions.server + path,
-    method: 'GET',
-    json: {}
-  }
-
-  request(requestOptions, function (err, response, body) {
-    var data = body
-
-    if (response.statusCode === 200) {
-      data.coords = {
-        lng: body.coords[0],
-        lat: body.coords[1]
-      }
-      renderDetailPage(req, res, data)
-    } else {
-      _showError(req, res, response.statusCode)
-    }
+  getLocationInfo(req, res, function (req, res, responseData) {
+    renderDetailPage(req, res, responseData)
   })
 }
 
 /* GET add review page */
 module.exports.addReview = function (req, res) {
-  res.render('location-review-form', {
-    title: 'Review Starcups on Loc8r',
-    pageHeader: {
-      title: 'Review Starcups'
+  getLocationInfo(req, res, function (req, res, responseData) {
+    renderReviewForm(req, res, responseData)
+  })
+}
+
+module.exports.doAddReview = function (req, res) {
+  var locationId = req.params.locationId
+  var path = '/api/locations/' + locationId + '/reviews'
+  var postData = {
+    author: req.body.name,
+    rating: parseInt(req.body.rating, 10),
+    reviewText: req.body.review
+  }
+  var requestOptions = {
+    url: apiOptions.server + path,
+    method: 'POST',
+    json: postData
+  }
+
+  request(requestOptions, function (err, response, body) {
+    if (err) {
+      _showError(req, res, err)
+    }
+
+    if (response.statusCode === 201) {
+      res.redirect('/location/' + locationId)
+    } else {
+      _showError(req, res, response.statusCode)
     }
   })
 }
