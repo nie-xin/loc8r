@@ -43,8 +43,6 @@ module.exports.locationsListByDistance = function (req, res) {
     num: 10
   }
 
-  console.log(point, geoOptions)
-
   Loc.geoNear(point, geoOptions, function (err, results, stats) {
     console.log('Geo Results', results)
     console.log('Geo stats', stats)
