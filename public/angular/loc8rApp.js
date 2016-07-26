@@ -45,7 +45,17 @@ var locationListController = function ($scope) {
   }
 }
 
+var ratingStars = function () {
+  return {
+    scope: {
+      thisRating: '=rating'
+    },
+    templateUrl: '/angular/rating-stars.html'
+  }
+}
+
 angular
   .module('loc8rApp')
   .controller('locationListController', locationListController)
   .filter('formatDistance', formatDistance)
+  .directive('ratingStars', ratingStars)
