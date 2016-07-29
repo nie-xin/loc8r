@@ -1,5 +1,6 @@
 var mongoose = require('mongoose')
 require('./locations')
+require('./user')
 
 var dbURI = 'mongodb://localhost/Loc8r'
 if (process.env.NODE_ENV === 'production') {
